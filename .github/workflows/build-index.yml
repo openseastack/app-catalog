@@ -1,0 +1,89 @@
+name: Build Catalog Index
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install jsonschema
+
+      - name: Validate manifests
+        run: |
+          python -c "
+          import json, jsonschema, sys
+          from pathlib import Path
+
+          schema = json.loads(Path('catalog.schema.json').read_text())
+          errors = []
+          for mf in Path('apps').glob('*/manifest.json'):
+              data = json.loads(mf.read_text())
+              try:
+                  jsonschema.validate(data, schema)
+                  # Check id matches directory name
+                  if data['id'] != mf.parent.name:
+                      errors.append(f'{mf}: id \"{data[\"id\"]}\" != dir \"{mf.parent.name}\"')
+              except jsonschema.ValidationError as e:
+                  errors.append(f'{mf}: {e.message}')
+
+          if errors:
+              for e in errors:
+                  print(f'ERROR: {e}')
+              sys.exit(1)
+          print('All manifests valid')
+          "
+
+      - name: Check icons
+        run: |
+          for dir in apps/*/; do
+            if [ -f "$dir/manifest.json" ]; then
+              icon=$(python -c "import json; print(json.load(open('${dir}manifest.json')).get('icon',''))")
+              if [ -n "$icon" ] && [ ! -f "${dir}${icon}" ]; then
+                echo "ERROR: ${dir} references icon '$icon' but file not found"
+                exit 1
+              fi
+              if [ -f "${dir}${icon}" ]; then
+                size=$(stat -f%z "${dir}${icon}" 2>/dev/null || stat -c%s "${dir}${icon}")
+                if [ "$size" -gt 102400 ]; then
+                  echo "ERROR: ${dir}${icon} is ${size} bytes (max 100KB)"
+                  exit 1
+                fi
+              fi
+            fi
+          done
+          echo "All icons OK"
+
+  build-and-deploy:
+    needs: validate
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Build index
+        run: python scripts/build_index.py
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: .
+          keep_files: false

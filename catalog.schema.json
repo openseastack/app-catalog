@@ -1,0 +1,94 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "OpenSeaStack App Manifest",
+  "type": "object",
+  "required": ["id", "name", "version", "description", "container"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+$",
+      "description": "Unique app identifier (lowercase, hyphens only)"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 256
+    },
+    "author": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "url": { "type": "string", "format": "uri" }
+      },
+      "required": ["name"]
+    },
+    "license": { "type": "string" },
+    "category": {
+      "type": "string",
+      "enum": ["navigation", "monitoring", "automation", "ai", "tools", "media", "communication"]
+    },
+    "icon": { "type": "string" },
+    "container": {
+      "type": "object",
+      "required": ["image", "tag"],
+      "properties": {
+        "image": { "type": "string" },
+        "tag": { "type": "string" },
+        "ports": {
+          "type": "array",
+          "items": { "type": "string", "pattern": "^\\d+:\\d+$" }
+        },
+        "volumes": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "environment": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        },
+        "devices": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "network": { "type": "string" },
+        "restart_policy": { "type": "string" },
+        "capabilities": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "config_schema": { "type": "object" },
+    "access": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["label", "url", "type"],
+        "properties": {
+          "label": { "type": "string" },
+          "url": { "type": "string" },
+          "type": { "type": "string", "enum": ["http", "https", "vnc", "tcp"] }
+        }
+      }
+    },
+    "requirements": {
+      "type": "object",
+      "properties": {
+        "min_os_version": { "type": "string" },
+        "architectures": {
+          "type": "array",
+          "items": { "type": "string", "enum": ["aarch64", "x86_64", "armv7l"] }
+        },
+        "min_ram_mb": { "type": "integer", "minimum": 0 }
+      }
+    }
+  }
+}
