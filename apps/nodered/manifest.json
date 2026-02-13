@@ -1,0 +1,41 @@
+{
+    "id": "nodered",
+    "name": "Node-RED",
+    "version": "1.0.0",
+    "description": "Flow-based programming tool for wiring together hardware devices, APIs and online services",
+    "author": {
+        "name": "OpenJS Foundation",
+        "url": "https://nodered.org"
+    },
+    "license": "Apache-2.0",
+    "category": "automation",
+    "container": {
+        "image": "nodered/node-red",
+        "tag": "latest",
+        "ports": [
+            "1880:1880"
+        ],
+        "volumes": [
+            "/data/nodered:/data"
+        ],
+        "environment": {
+            "TZ": "UTC"
+        },
+        "network": "oss-network",
+        "restart_policy": "unless-stopped"
+    },
+    "access": [
+        {
+            "label": "Web UI",
+            "url": "http://{host}:1880",
+            "type": "http"
+        }
+    ],
+    "requirements": {
+        "architectures": [
+            "aarch64",
+            "x86_64"
+        ],
+        "min_ram_mb": 256
+    }
+}

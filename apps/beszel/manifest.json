@@ -1,0 +1,38 @@
+{
+    "id": "beszel",
+    "name": "Beszel",
+    "version": "1.0.0",
+    "description": "Lightweight server monitoring hub",
+    "author": {
+        "name": "henrygd",
+        "url": "https://github.com/henrygd/beszel"
+    },
+    "license": "MIT",
+    "category": "monitoring",
+    "container": {
+        "image": "henrygd/beszel",
+        "tag": "latest",
+        "ports": [
+            "8090:8090"
+        ],
+        "volumes": [
+            "/data/beszel:/beszel_data"
+        ],
+        "network": "oss-network",
+        "restart_policy": "unless-stopped"
+    },
+    "access": [
+        {
+            "label": "Web UI",
+            "url": "http://{host}:8090",
+            "type": "http"
+        }
+    ],
+    "requirements": {
+        "architectures": [
+            "aarch64",
+            "x86_64"
+        ],
+        "min_ram_mb": 128
+    }
+}

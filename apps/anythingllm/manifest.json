@@ -1,0 +1,39 @@
+{
+    "id": "anythingllm",
+    "name": "AnythingLLM",
+    "version": "1.0.0",
+    "description": "All-in-one AI application with local LLMs, RAG, and agents",
+    "author": {
+        "name": "Mintplex Labs",
+        "url": "https://github.com/Mintplex-Labs/anything-llm"
+    },
+    "license": "MIT",
+    "category": "ai",
+    "container": {
+        "image": "mintplexlabs/anythingllm",
+        "tag": "master",
+        "ports": [
+            "3001:3001"
+        ],
+        "volumes": [
+            "/data/anythingllm/storage:/app/server/storage",
+            "/data/anythingllm/env:/app/server/.env"
+        ],
+        "network": "oss-network",
+        "restart_policy": "unless-stopped"
+    },
+    "access": [
+        {
+            "label": "Web UI",
+            "url": "http://{host}:3001",
+            "type": "http"
+        }
+    ],
+    "requirements": {
+        "architectures": [
+            "aarch64",
+            "x86_64"
+        ],
+        "min_ram_mb": 1024
+    }
+}

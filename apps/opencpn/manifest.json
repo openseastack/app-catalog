@@ -1,0 +1,83 @@
+{
+    "id": "opencpn",
+    "name": "OpenCPN",
+    "version": "1.0.0",
+    "description": "Professional chart plotter and navigation software with remote VNC access",
+    "author": {
+        "name": "OpenSeaStack",
+        "url": "https://github.com/openseastack"
+    },
+    "license": "GPL-2.0",
+    "category": "navigation",
+    "icon": "icon.png",
+    "container": {
+        "image": "ghcr.io/openseastack/opencpn",
+        "tag": "latest",
+        "ports": [
+            "5900:5900",
+            "6080:6080"
+        ],
+        "volumes": [
+            "/data/openseastack/opencpn:/home/opencpn/.opencpn",
+            "/data/openseastack/charts:/charts:ro",
+            "/etc/avahi/services:/etc/avahi/services"
+        ],
+        "environment": {
+            "DISPLAY_WIDTH": "1024",
+            "DISPLAY_HEIGHT": "768",
+            "VNC_PORT": "5900",
+            "NOVNC_PORT": "6080"
+        },
+        "devices": [
+            "/dev/dri:/dev/dri"
+        ],
+        "network": "oss-network",
+        "restart_policy": "unless-stopped"
+    },
+    "config_schema": {
+        "resolution": {
+            "type": "select",
+            "label": "Display Resolution",
+            "default": "1024x768",
+            "options": [
+                "1024x768",
+                "1280x720",
+                "1920x1080"
+            ],
+            "env_map": {
+                "1024x768": {
+                    "DISPLAY_WIDTH": "1024",
+                    "DISPLAY_HEIGHT": "768"
+                },
+                "1280x720": {
+                    "DISPLAY_WIDTH": "1280",
+                    "DISPLAY_HEIGHT": "720"
+                },
+                "1920x1080": {
+                    "DISPLAY_WIDTH": "1920",
+                    "DISPLAY_HEIGHT": "1080"
+                }
+            }
+        }
+    },
+    "access": [
+        {
+            "label": "Web VNC",
+            "url": "http://{host}:6080",
+            "type": "http"
+        },
+        {
+            "label": "VNC Direct",
+            "url": "vnc://{host}:5900",
+            "type": "vnc"
+        }
+    ],
+    "requirements": {
+        "min_os_version": "0.1.0",
+        "architectures": [
+            "aarch64",
+            "x86_64"
+        ],
+        "min_ram_mb": 512
+    }
+}

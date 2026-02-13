@@ -1,0 +1,41 @@
+{
+    "id": "searxng",
+    "name": "SearXNG",
+    "version": "1.0.0",
+    "description": "Privacy-respecting metasearch engine",
+    "author": {
+        "name": "SearXNG Team",
+        "url": "https://github.com/searxng/searxng"
+    },
+    "license": "AGPL-3.0",
+    "category": "tools",
+    "container": {
+        "image": "searxng/searxng",
+        "tag": "latest",
+        "ports": [
+            "8081:8080"
+        ],
+        "volumes": [
+            "/data/searxng:/etc/searxng"
+        ],
+        "environment": {
+            "SEARXNG_BASE_URL": "http://localhost:8081/"
+        },
+        "network": "oss-network",
+        "restart_policy": "unless-stopped"
+    },
+    "access": [
+        {
+            "label": "Web UI",
+            "url": "http://{host}:8081",
+            "type": "http"
+        }
+    ],
+    "requirements": {
+        "architectures": [
+            "aarch64",
+            "x86_64"
+        ],
+        "min_ram_mb": 256
+    }
+}
