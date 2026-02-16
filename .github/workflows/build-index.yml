@@ -54,7 +54,7 @@ jobs:
                 exit 1
               fi
               if [ -f "${dir}${icon}" ]; then
-                size=$(stat -f%z "${dir}${icon}" 2>/dev/null || stat -c%s "${dir}${icon}")
+                size=$(stat -c%s "${dir}${icon}" 2>/dev/null || stat -f%z "${dir}${icon}")
                 if [ "$size" -gt 102400 ]; then
                   echo "ERROR: ${dir}${icon} is ${size} bytes (max 100KB)"
                   exit 1
@@ -71,6 +71,9 @@ jobs:
     permissions:
       pages: write
       id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
 
@@ -81,9 +84,11 @@ jobs:
       - name: Build index
         run: python scripts/build_index.py
 
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: .
-          keep_files: false
+          path: .
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
